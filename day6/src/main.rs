@@ -18,8 +18,8 @@ fn update(mut counts: Vec<usize>) -> Vec<usize> {
     counts
 }
 
-fn simulate(inputs: &Vec<usize>, times: usize) -> usize {
-    let mut res = inputs.clone();
+fn simulate(inputs: &[usize], times: usize) -> usize {
+    let mut res = inputs.to_owned();
     for _ in 0..times {
         res = update(res);
     }
