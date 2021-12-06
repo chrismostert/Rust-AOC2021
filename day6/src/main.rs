@@ -1,14 +1,12 @@
 use std::collections::VecDeque;
 
 fn read_input(input: &str) -> VecDeque<usize> {
-    let mut res = VecDeque::from_iter([0; 9]);
-    for num in input
+    input
         .split(',')
-        .map(|numstr| numstr.parse::<usize>().unwrap())
-    {
-        res[num] += 1;
-    }
-    res
+        .fold(VecDeque::from_iter([0; 9]), |mut counts, num| {
+            counts[num.parse::<usize>().unwrap()] += 1;
+            counts
+        })
 }
 
 fn simulate(inputs: &VecDeque<usize>, times: usize) -> usize {
