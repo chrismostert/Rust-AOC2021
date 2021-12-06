@@ -14,9 +14,8 @@ fn read_input(input: &str) -> VecDeque<usize> {
 fn simulate(inputs: &VecDeque<usize>, times: usize) -> usize {
     let mut res = inputs.to_owned();
     for _ in 0..times {
-        let reproducing = res.pop_front().unwrap();
-        res[6] += reproducing;
-        res.push_back(reproducing);
+        res.rotate_left(1);
+        res[6] += res[8];
     }
     res.iter().sum()
 }
