@@ -1,5 +1,7 @@
-fn read_input(input: &str) -> Vec<usize> {
-    let mut res = vec![0; 9];
+use std::collections::VecDeque;
+
+fn read_input(input: &str) -> VecDeque<usize> {
+    let mut res = VecDeque::from_iter([0; 9]);
 
     for num in input
         .split(',')
@@ -11,14 +13,14 @@ fn read_input(input: &str) -> Vec<usize> {
     res
 }
 
-fn update(mut counts: Vec<usize>) -> Vec<usize> {
-    let reproducing = counts.drain(0..1).next().unwrap();
+fn update(mut counts: VecDeque<usize>) -> VecDeque<usize> {
+    let reproducing = counts.pop_front().unwrap();
     counts[6] += reproducing;
-    counts.push(reproducing);
+    counts.push_back(reproducing);
     counts
 }
 
-fn simulate(inputs: &[usize], times: usize) -> usize {
+fn simulate(inputs: &VecDeque<usize>, times: usize) -> usize {
     let mut res = inputs.to_owned();
     for _ in 0..times {
         res = update(res);
