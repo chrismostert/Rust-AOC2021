@@ -3,36 +3,30 @@ use std::collections::HashSet;
 fn decode(input_line: &str) -> usize {
     let (signal, output) = input_line.split_once(" | ").unwrap();
     let (one, four) = get_decode_key(signal);
-    let mut res = Vec::with_capacity(4);
-
-    for digit in output.split_whitespace().map(to_hashset) {
-        let len = digit.len();
-        match len {
-            2 => res.push(1),
-            3 => res.push(7),
-            4 => res.push(4),
-            7 => res.push(8),
-            5 => {
-                if four.intersection(&digit).count() == 2 {
-                    res.push(2)
-                } else if one.intersection(&digit).count() == 2 {
-                    res.push(3)
-                } else {
-                    res.push(5)
+    let res =
+        output
+            .split_whitespace()
+            .map(to_hashset)
+            .fold(Vec::with_capacity(4), |mut res, digit| {
+                match (
+                    digit.len(),
+                    one.intersection(&digit).count(),
+                    four.intersection(&digit).count(),
+                ) {
+                    (2, _, _) => res.push(1),
+                    (3, _, _) => res.push(7),
+                    (4, _, _) => res.push(4),
+                    (5, 2, _) => res.push(3),
+                    (5, _, 2) => res.push(2),
+                    (5, _, _) => res.push(5),
+                    (6, 1, _) => res.push(6),
+                    (6, _, 4) => res.push(9),
+                    (6, _, _) => res.push(0),
+                    (7, _, _) => res.push(8),
+                    _ => unreachable!(),
                 }
-            }
-            6 => {
-                if one.intersection(&digit).count() == 1 {
-                    res.push(6)
-                } else if four.intersection(&digit).count() == 4 {
-                    res.push(9)
-                } else {
-                    res.push(0)
-                }
-            }
-            _ => unreachable!(),
-        }
-    }
+                res
+            });
     res[0] * 1000 + res[1] * 100 + res[2] * 10 + res[3]
 }
 
@@ -53,7 +47,6 @@ fn main() {
         .lines()
         .map(decode)
         .collect::<Vec<usize>>();
-
     println!(
         "Part 1: {}",
         decoded
