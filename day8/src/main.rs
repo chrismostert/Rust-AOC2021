@@ -56,13 +56,15 @@ fn main() {
 
     println!(
         "Part 1: {}",
-        decoded.iter().fold(0, |acc, &x| {
-            acc + x
-                .to_string()
-                .bytes()
-                .filter(|&x| (x == b'1') | (x == b'4') | (x == b'7') | (x == b'8'))
-                .count()
-        })
+        decoded
+            .iter()
+            .map(|&x| {
+                x.to_string()
+                    .bytes()
+                    .filter(|&x| (x == b'1') | (x == b'4') | (x == b'7') | (x == b'8'))
+                    .count()
+            })
+            .sum::<usize>()
     );
     println!("Part 2: {}", decoded.iter().sum::<usize>());
 }
