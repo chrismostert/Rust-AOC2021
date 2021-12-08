@@ -1,22 +1,5 @@
 use std::collections::HashSet;
 
-fn p1(input: &str) -> usize {
-    input.lines().fold(0, |res, x| {
-        let (_, output) = x.split_once(" | ").unwrap();
-        res + output.split_whitespace().fold(0, |linecount, y| {
-            let len = y.len();
-            if (len == 2) | (len == 3) | (len == 4) | (len == 7) {
-                return linecount + 1;
-            }
-            linecount
-        })
-    })
-}
-
-fn p2(input: &str) -> usize {
-    input.lines().fold(0, |res, line| res + decode(line))
-}
-
 fn decode(input_line: &str) -> usize {
     let (signal, output) = input_line.split_once(" | ").unwrap();
     let (one, four) = get_decode_key(signal);
@@ -66,8 +49,20 @@ fn to_hashset(chars: &str) -> HashSet<u8> {
 }
 
 fn main() {
-    let input = include_str!("../input.txt");
+    let decoded = include_str!("../input.txt")
+        .lines()
+        .map(decode)
+        .collect::<Vec<usize>>();
 
-    println!("Part 1: {}", p1(input));
-    println!("Part 2: {}", p2(input));
+    println!(
+        "Part 1: {}",
+        decoded.iter().fold(0, |acc, &x| {
+            acc + x
+                .to_string()
+                .bytes()
+                .filter(|&x| (x == b'1') | (x == b'4') | (x == b'7') | (x == b'8'))
+                .count()
+        })
+    );
+    println!("Part 2: {}", decoded.iter().sum::<usize>());
 }
