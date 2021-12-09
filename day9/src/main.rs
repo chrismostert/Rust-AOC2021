@@ -1,6 +1,5 @@
 use itertools::sorted;
 use std::collections::HashSet;
-use std::collections::VecDeque;
 
 type Coordinate = (usize, usize);
 type Grid = Vec<Vec<u32>>;
@@ -30,10 +29,7 @@ fn solve(input: &Grid) -> (u32, usize) {
     }
     (
         p1,
-        sorted(basins.iter()).rev().take(3).fold(1, |mut acc, x| {
-            acc *= x;
-            acc
-        }),
+        sorted(basins.iter()).rev().take(3).product(),
     )
 }
 
@@ -41,11 +37,11 @@ fn basin_size(input: &Grid, coord: Coordinate) -> usize {
     let mut res = 0;
 
     let mut visited: HashSet<Coordinate> = HashSet::default();
-    let mut visiting = VecDeque::default();
+    let mut visiting = Vec::default();
 
-    visiting.push_front(coord);
+    visiting.push(coord);
 
-    while let Some(c) = visiting.pop_front() {
+    while let Some(c) = visiting.pop() {
         if visited.contains(&c) {
             continue;
         }
