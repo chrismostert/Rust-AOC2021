@@ -18,51 +18,40 @@ fn parse_input(input: &str) -> Grid {
 fn solve(input: &Grid) -> (u32, usize) {
     let mut p1 = 0;
     let mut basins: Vec<usize> = Vec::new();
-
     for (i, row) in input.iter().enumerate() {
         for (j, elem) in row.iter().enumerate() {
             if is_low(input, (i, j)) {
                 p1 += 1 + elem;
-                basins.push(basin_size(input, (i, j)));
+                basins.push(basin_size(input, (i, j), &mut HashSet::default()));
             }
         }
     }
-    (
-        p1,
-        sorted(basins.iter()).rev().take(3).product(),
-    )
+    (p1, sorted(basins.iter()).rev().take(3).product())
 }
 
-fn basin_size(input: &Grid, coord: Coordinate) -> usize {
-    let mut res = 0;
-
-    let mut visited: HashSet<Coordinate> = HashSet::default();
-    let mut visiting = Vec::default();
-
-    visiting.push(coord);
-
-    while let Some(c) = visiting.pop() {
-        if visited.contains(&c) {
-            continue;
-        }
-        res += 1;
-        visited.insert(c);
-
-        visiting.extend(neighbors(input, c).iter().filter(|&x| input[x.0][x.1] < 9));
+fn basin_size(input: &Grid, coord: Coordinate, visited: &mut HashSet<Coordinate>) -> usize {
+    visited.insert(coord);
+    let next: Vec<Coordinate> = neighbors(input, coord)
+        .into_iter()
+        .filter(|x| (input[x.0][x.1] < 9) & !visited.contains(x))
+        .collect();
+    if next.is_empty() {
+        visited.len()
+    } else {
+        next.iter()
+            .map(|&c| basin_size(input, c, visited))
+            .max()
+            .unwrap()
     }
-
-    res
 }
 
 fn is_low(input: &Grid, coord: Coordinate) -> bool {
     let n = neighbors(input, coord);
-    let res = n
-        .iter()
+    n.iter()
         .map(|(x, y)| (input[*x][*y]))
         .filter(|num| (num > &input[coord.0][coord.1]))
         .count()
-        == n.len();
-    res
+        == n.len()
 }
 
 fn neighbors(input: &Grid, coord: Coordinate) -> Vec<Coordinate> {
