@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::collections::HashSet;
 
 fn check_corrupt(line: &str) -> usize {
     let decreasing: HashMap<char, char> =
@@ -19,12 +20,11 @@ fn check_corrupt(line: &str) -> usize {
 }
 
 fn fix_score(line: &str) -> usize {
-    let decreasing: HashMap<char, char> =
-        HashMap::from_iter([('}', '{'), (']', '['), (')', '('), ('>', '<')]);
+    let decreasing: HashSet<char> = HashSet::from_iter(['}', ']', ')', '>']);
     let scores: HashMap<char, usize> = HashMap::from_iter([('{', 3), ('[', 2), ('(', 1), ('<', 4)]);
     let mut last_opened = Vec::default();
     for c in line.chars() {
-        if decreasing.get(&c).is_some() {
+        if decreasing.contains(&c) {
             last_opened.pop();
         } else {
             last_opened.push(c);
@@ -41,8 +41,11 @@ fn p1(input: &str) -> usize {
 }
 
 fn p2(input: &str) -> usize {
-    let non_corrupt = input.lines().filter(|&line| check_corrupt(line) == 0);
-    let mut scores: Vec<usize> = non_corrupt.map(fix_score).collect();
+    let mut scores: Vec<usize> = input
+        .lines()
+        .filter(|&line| check_corrupt(line) == 0)
+        .map(fix_score)
+        .collect();
     scores.sort_unstable();
     scores[scores.len() / 2]
 }
