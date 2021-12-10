@@ -1,57 +1,61 @@
 use std::collections::HashMap;
-use std::collections::HashSet;
 
-fn check_corrupt(line: &str) -> usize {
-    let decreasing: HashMap<char, char> =
+enum ParseResult {
+    Corrupt(usize),
+    Completed(usize),
+}
+
+fn check_line(line: &str) -> ParseResult {
+    let revmap: HashMap<char, char> =
         HashMap::from_iter([('}', '{'), (']', '['), (')', '('), ('>', '<')]);
-    let scores: HashMap<char, usize> =
+    let corrupt_scores: HashMap<char, usize> =
         HashMap::from_iter([('{', 1197), ('[', 57), ('(', 3), ('<', 25137)]);
+    let fix_scores: HashMap<char, usize> =
+        HashMap::from_iter([('{', 3), ('[', 2), ('(', 1), ('<', 4)]);
+
     let mut last_opened = Vec::default();
     for c in line.chars() {
-        if let Some(&v) = decreasing.get(&c) {
+        if let Some(&v) = revmap.get(&c) {
             if v != last_opened.pop().unwrap() {
-                return *scores.get(&v).unwrap();
+                return ParseResult::Corrupt(*corrupt_scores.get(&v).unwrap());
             }
         } else {
             last_opened.push(c);
         }
     }
-    0
+    ParseResult::Completed(
+        last_opened
+            .iter()
+            .rev()
+            .fold(0, |acc, x| acc * 5 + fix_scores.get(x).unwrap()),
+    )
 }
 
-fn fix_score(line: &str) -> usize {
-    let decreasing: HashSet<char> = HashSet::from_iter(['}', ']', ')', '>']);
-    let scores: HashMap<char, usize> = HashMap::from_iter([('{', 3), ('[', 2), ('(', 1), ('<', 4)]);
-    let mut last_opened = Vec::default();
-    for c in line.chars() {
-        if decreasing.contains(&c) {
-            last_opened.pop();
-        } else {
-            last_opened.push(c);
+fn p1(input: &[ParseResult]) -> usize {
+    input.iter().fold(0, |mut acc, x| {
+        if let ParseResult::Corrupt(v) = x {
+            acc += v;
         }
-    }
-    last_opened
-        .iter()
-        .rev()
-        .fold(0, |acc, x| acc * 5 + scores.get(x).unwrap())
+        acc
+    })
 }
 
-fn p1(input: &str) -> usize {
-    input.lines().map(check_corrupt).sum()
-}
-
-fn p2(input: &str) -> usize {
-    let mut scores: Vec<usize> = input
-        .lines()
-        .filter(|&line| check_corrupt(line) == 0)
-        .map(fix_score)
-        .collect();
-    scores.sort_unstable();
-    scores[scores.len() / 2]
+fn p2(input: &[ParseResult]) -> usize {
+    let mut res = input.iter().fold(Vec::new(), |mut acc, x| {
+        if let ParseResult::Completed(v) = x {
+            acc.push(v);
+        }
+        acc
+    });
+    res.sort_unstable();
+    *res[res.len() / 2]
 }
 
 fn main() {
-    let input = include_str!("../input.txt");
-    println!("Part 1: {}", p1(input));
-    println!("Part 2: {}", p2(input));
+    let input: Vec<ParseResult> = include_str!("../input.txt")
+        .lines()
+        .map(check_line)
+        .collect();
+    println!("Part 1: {}", p1(&input));
+    println!("Part 2: {}", p2(&input));
 }
