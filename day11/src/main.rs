@@ -37,12 +37,13 @@ fn neighbors(input: &[Vec<Octopus>], coord: Coordinate) -> Vec<Coordinate> {
 fn do_step(input: &mut Grid) -> usize {
     let mut continuing = true;
     let mut ignitions = 0;
+    let len = input.len();
 
     // Increase energy by 1
-    for row in 0..input.len() {
-        for col in 0..input.len() {
-            if let Octopus::Charging(v) = input[row][col] {
-                input[row][col] = Octopus::Charging(v + 1);
+    for row in input.iter_mut() {
+        for octopus in row {
+            if let Octopus::Charging(v) = octopus {
+                *octopus = Octopus::Charging(*v + 1);
             };
         }
     }
@@ -51,8 +52,8 @@ fn do_step(input: &mut Grid) -> usize {
     while continuing {
         continuing = false;
 
-        for row in 0..input.len() {
-            for col in 0..input.len() {
+        for row in 0..len {
+            for col in 0..len {
                 // Ignite?
                 if let Octopus::Charging(v) = input[row][col] {
                     if v > 9 {
@@ -72,10 +73,10 @@ fn do_step(input: &mut Grid) -> usize {
     }
 
     // Reset all ignitied octopi
-    for row in 0..input.len() {
-        for col in 0..input.len() {
-            if let Octopus::Exploded = input[row][col] {
-                input[row][col] = Octopus::Charging(0);
+    for row in input.iter_mut() {
+        for octopus in row {
+            if let Octopus::Exploded = octopus {
+                *octopus = Octopus::Charging(0);
             }
         }
     }
