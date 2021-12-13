@@ -41,8 +41,8 @@ fn print_grid(grid: &Grid) {
     for y in 0..h {
         for x in 0..w {
             match grid.get(&(x, y)) {
-                Some(_) => print!("⬜"),
-                None => print!("⬛"),
+                Some(_) => print!("#"),
+                None => print!(" "),
             }
         }
         println!();
