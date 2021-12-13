@@ -31,14 +31,8 @@ fn get_instructions(input: &'static str) -> impl Iterator<Item = FoldInstruction
 }
 
 fn grid_size(grid: &Grid) -> (usize, usize) {
-    grid.iter().fold((0, 0), |mut acc, x| {
-        if x.0 + 1 > acc.0 {
-            acc.0 = x.0 + 1;
-        };
-        if x.1 + 1 > acc.1 {
-            acc.1 = x.1 + 1;
-        };
-        acc
+    grid.iter().fold((0, 0), |(a, b), (x, y)| {
+        (Ord::max(a, x + 1), Ord::max(b, y + 1))
     })
 }
 
