@@ -41,8 +41,8 @@ fn print_grid(grid: &Grid) {
     for y in 0..h {
         for x in 0..w {
             match grid.get(&(x, y)) {
-                Some(_) => print!("#"),
-                None => print!(" "),
+                Some(_) => print!("⬜"),
+                None => print!("⬛"),
             }
         }
         println!();
@@ -50,25 +50,21 @@ fn print_grid(grid: &Grid) {
 }
 
 fn do_fold(grid: &mut Grid, instruction: FoldInstruction) {
-    let (w, h) = grid_size(grid);
+    let vals: Vec<(usize, usize)> = grid.iter().cloned().collect();
     match instruction {
         FoldInstruction::Up(line) => {
-            for x in 0..w {
-                for y in line + 1..h {
-                    if grid.get(&(x, y)).is_some() {
-                        grid.insert((x, line - (y - line)));
-                        grid.remove(&(x, y));
-                    }
+            for (x, y) in vals {
+                if y > line {
+                    grid.insert((x, line - (y - line)));
+                    grid.remove(&(x, y));
                 }
             }
         }
         FoldInstruction::Left(line) => {
-            for x in line + 1..w {
-                for y in 0..h {
-                    if grid.get(&(x, y)).is_some() {
-                        grid.insert((line - (x - line), y));
-                        grid.remove(&(x, y));
-                    }
+            for (x, y) in vals {
+                if x > line {
+                    grid.insert((line - (x - line), y));
+                    grid.remove(&(x, y));
                 }
             }
         }
