@@ -33,12 +33,21 @@ fn do_step(
     let cur_pairs = pair_counts.clone();
     for (pair, amount) in cur_pairs {
         if let Some(&to_insert) = rules.get(&*pair) {
-            *pair_counts.get_mut(&pair).unwrap() = pair_counts[&pair].saturating_sub(amount);
+            match pair_counts[&pair].saturating_sub(amount) {
+                0 => {
+                    pair_counts.remove(&pair);
+                }
+                amount => {
+                    *pair_counts.get_mut(&pair).unwrap() = amount;
+                }
+            }
 
-            let a = format!("{}{}", &pair[..1], to_insert);
-            let b = format!("{}{}", to_insert, &pair[1..]);
-            *pair_counts.entry(a).or_insert(0) += amount;
-            *pair_counts.entry(b).or_insert(0) += amount;
+            for to_inc in [
+                format!("{}{}", &pair[..1], to_insert),
+                format!("{}{}", to_insert, &pair[1..]),
+            ] {
+                *pair_counts.entry(to_inc).or_insert(0) += amount;
+            }
 
             *char_counts.entry(to_insert.to_owned()).or_insert(0) += amount;
         }
