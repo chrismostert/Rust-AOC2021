@@ -34,8 +34,7 @@ fn main() {
     let (polymer_input, rules_input) = include_str!("../input.txt").split_once("\n\n").unwrap();
     let mut pair_counts = polymer_input
         .chars()
-        .tuple_windows()
-        .map(|(a, b)| (a, b))
+        .tuple_windows::<(_, _)>()
         .counts();
     let mut char_counts = polymer_input.chars().counts();
     let rules = get_rules(rules_input);
