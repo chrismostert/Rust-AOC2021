@@ -1,4 +1,8 @@
-fn trajectory(x: usize, y: isize) -> impl Iterator<Item = (usize, isize)> {
+type Xrange = (usize, usize);
+type Yrange = (isize, isize);
+type Coord = (usize, isize);
+
+fn trajectory(x: usize, y: isize) -> impl Iterator<Item = Coord> {
     (0..).scan((0, 0), move |(xres, yres), t| {
         *xres += x.saturating_sub(t);
         *yres += y - t as isize;
@@ -6,19 +10,13 @@ fn trajectory(x: usize, y: isize) -> impl Iterator<Item = (usize, isize)> {
     })
 }
 
-fn hit(
-    coord: (usize, isize),
-    target_xrange: (usize, usize),
-    target_yrange: (isize, isize),
-) -> bool {
-    (coord.0 >= target_xrange.0 && coord.0 <= target_xrange.1)
-        && (coord.1 >= target_yrange.0 && coord.1 <= target_yrange.1)
+fn hit(coord: Coord, target_xrange: Xrange, target_yrange: Yrange) -> bool {
+    let (x, y) = &coord;
+    (target_xrange.0..=target_xrange.1).contains(x)
+        && (target_yrange.0..=target_yrange.1).contains(y)
 }
 
-fn get_trajectories(
-    target_xrange: (usize, usize),
-    target_yrange: (isize, isize),
-) -> (isize, usize) {
+fn get_trajectories(target_xrange: Xrange, target_yrange: Yrange) -> (isize, usize) {
     let mut max_y = 0;
     let mut amount = 0;
     for x in 0..=target_xrange.1 {
