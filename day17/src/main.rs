@@ -10,10 +10,8 @@ fn trajectory(x: usize, y: isize) -> impl Iterator<Item = Coord> {
     })
 }
 
-fn hit(coord: Coord, target_xrange: Xrange, target_yrange: Yrange) -> bool {
-    let (x, y) = &coord;
-    (target_xrange.0..=target_xrange.1).contains(x)
-        && (target_yrange.0..=target_yrange.1).contains(y)
+fn hit((x, y): Coord, (xs, xe): Xrange, (ys, ye): Yrange) -> bool {
+    (xs..=xe).contains(&x) && (ys..=ye).contains(&y)
 }
 
 fn get_trajectories(target_xrange: Xrange, target_yrange: Yrange) -> (isize, usize) {
