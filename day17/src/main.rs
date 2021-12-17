@@ -21,10 +21,8 @@ fn get_trajectories(
 ) -> (isize, usize) {
     let mut max_y = 0;
     let mut amount = 0;
-    for x in 0..target_xrange.1 + 1 {
-        'yloop: for y in
-            target_yrange.0..((target_yrange.0 - target_yrange.1).abs() + target_yrange.1.abs())
-        {
+    for x in 0..=target_xrange.1 {
+        'yloop: for y in target_yrange.0..=target_yrange.0.abs() {
             let mut max = isize::MIN;
             for c in
                 trajectory(x, y).take_while(|(a, b)| *a <= target_xrange.1 && *b >= target_yrange.0)
