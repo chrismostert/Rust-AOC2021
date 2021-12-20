@@ -64,6 +64,7 @@ impl ImageProcessor {
         } else {
             self.algorithm[0]
         };
+
         self.image = next_image;
     }
 
