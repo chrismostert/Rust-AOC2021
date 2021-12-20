@@ -6,33 +6,29 @@ struct ImageProcessor {
 
 impl ImageProcessor {
     fn new(algorithm_input: &str, image_input: &str) -> Self {
-        let algorithm = Self::parse_row(algorithm_input);
-        let image = Self::parse_image(image_input);
         ImageProcessor {
-            algorithm,
-            image,
+            algorithm: Self::parse_row(algorithm_input),
+            image: Self::parse_image(image_input),
             void_val: false,
         }
     }
 
     fn parse_row(input: &str) -> Vec<bool> {
-        let mut res = Vec::default();
-        for c in input.chars() {
+        input.chars().fold(Vec::default(), |mut acc, c| {
             match c {
-                '#' => res.push(true),
-                '.' => res.push(false),
+                '#' => acc.push(true),
+                '.' => acc.push(false),
                 _ => unreachable!(),
             }
-        }
-        res
+            acc
+        })
     }
 
     fn parse_image(image_input: &str) -> Vec<Vec<bool>> {
-        let mut res = Vec::default();
-        for row in image_input.lines() {
-            res.push(Self::parse_row(row));
-        }
-        res
+        image_input.lines().fold(Vec::default(), |mut acc, row| {
+            acc.push(Self::parse_row(row));
+            acc
+        })
     }
 
     fn get_pixel(&self, x: isize, y: isize) -> bool {
@@ -45,22 +41,17 @@ impl ImageProcessor {
     }
 
     fn get_new_value(&self, x: isize, y: isize) -> bool {
-        let idx: usize = self.get_pixel(x - 1, y - 1) as usize * 2usize.pow(8)
-            + self.get_pixel(x, y - 1) as usize * 2usize.pow(7)
-            + self.get_pixel(x + 1, y - 1) as usize * 2usize.pow(6)
-            + self.get_pixel(x - 1, y) as usize * 2usize.pow(5)
-            + self.get_pixel(x, y) as usize * 2usize.pow(4)
-            + self.get_pixel(x + 1, y) as usize * 2usize.pow(3)
-            + self.get_pixel(x - 1, y + 1) as usize * 2usize.pow(2)
-            + self.get_pixel(x, y + 1) as usize * 2usize.pow(1)
-            + self.get_pixel(x + 1, y + 1) as usize * 2usize.pow(0);
-        self.algorithm[idx]
+        let vals = (y - 1..=y + 1)
+            .scan(0, |_, y| {
+                Some((x - 1..=x + 1).scan(0, move |_, x| Some(self.get_pixel(x, y) as usize)))
+            })
+            .flatten();
+        let exps = (0..=8).rev().scan(0, |_, x| Some(2usize.pow(x)));
+        self.algorithm[vals.zip(exps).fold(0, |acc, (val, exp)| acc + val * exp)]
     }
 
     fn process(&mut self) {
-        let width = self.image[0].len();
-        let height = self.image.len();
-        let mut next_image = vec![vec![false; width + 2]; height + 2];
+        let mut next_image = vec![vec![false; self.image[0].len() + 2]; self.image.len() + 2];
 
         for y in 0..next_image.len() as isize {
             for x in 0..next_image[0].len() as isize {
