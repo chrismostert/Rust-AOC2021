@@ -36,9 +36,6 @@ impl ImageProcessor {
     }
 
     fn get_pixel(&self, x: isize, y: isize) -> bool {
-        if x < 0 && y < 0 {
-            return self.void_val;
-        }
         if let Some(row) = self.image.get(y as usize) {
             if let Some(&val) = row.get(x as usize) {
                 return val;
