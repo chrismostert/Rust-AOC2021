@@ -42,11 +42,9 @@ impl ImageProcessor {
 
     fn get_new_value(&self, x: isize, y: isize) -> bool {
         let vals = (y - 1..=y + 1)
-            .scan(0, |_, y| {
-                Some((x - 1..=x + 1).scan(0, move |_, x| Some(self.get_pixel(x, y) as usize)))
-            })
-            .flatten();
-        let exps = (0..=8).rev().scan(0, |_, x| Some(2usize.pow(x)));
+            .flat_map(|y| (x - 1..=x + 1).map(move |x| (x, y)))
+            .map(|(x, y)| self.get_pixel(x, y) as usize);
+        let exps = (0..=8).rev().map(|n| 2usize.pow(n));
         self.algorithm[vals.zip(exps).fold(0, |acc, (val, exp)| acc + val * exp)]
     }
 
