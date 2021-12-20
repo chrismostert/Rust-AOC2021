@@ -70,7 +70,12 @@ impl ImageProcessor {
                 next_image[y as usize][x as usize] = self.get_new_value(x - 1, y - 1);
             }
         }
-        self.void_val = !self.void_val;
+
+        self.void_val = if self.void_val {
+            self.algorithm[self.algorithm.len() - 1]
+        } else {
+            self.algorithm[0]
+        };
         self.image = next_image;
     }
 
