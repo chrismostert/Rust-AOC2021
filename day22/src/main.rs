@@ -76,13 +76,12 @@ fn get_n_lights(input: &[SignedCube]) -> isize {
 
     cubes.iter().fold(0, |n_lights, cube| {
         let cube_inner = cube.cube;
-        let area = (((cube_inner.0).1 - (cube_inner.0).0) + 1)
-            * (((cube_inner.1).1 - (cube_inner.1).0) + 1)
-            * (((cube_inner.2).1 - (cube_inner.2).0) + 1);
-        if cube.sign {
-            return n_lights + area;
+        let axis_size = |axis: Range| axis.1 - axis.0 + 1;
+        let area = axis_size(cube_inner.0) * axis_size(cube_inner.1) * axis_size(cube_inner.2);
+        match cube.sign {
+            true => n_lights + area,
+            false => n_lights - area,
         }
-        n_lights - area
     })
 }
 
