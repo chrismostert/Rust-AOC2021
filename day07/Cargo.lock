@@ -30,7 +30,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "day7"
+name = "day07"
 version = "0.1.0"
 dependencies = [
  "statistical",
