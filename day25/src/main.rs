@@ -1,5 +1,5 @@
 type Seafloor = Vec<Vec<Option<Cucumber>>>;
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 enum Cucumber {
     East,
     South,
@@ -20,29 +20,20 @@ fn parse_input(input: &str) -> Seafloor {
 }
 
 fn do_step(floor: &mut Seafloor, width: usize, height: usize) -> bool {
-    let prev = floor.clone();
     let mut changed = false;
+    let order = [Cucumber::East, Cucumber::South];
 
-    // East pass
-    for i in 0..height {
-        for j in 0..width {
-            if let Some(Cucumber::East) = prev[i][if j == 0 { width - 1 } else { j - 1 }] {
-                if prev[i][j].is_none() {
-                    floor[i][j] = Some(Cucumber::East);
-                    floor[i][if j == 0 { width - 1 } else { j - 1 }] = None;
-                    changed = true;
-                }
-            }
-        }
-    }
-    // South pass
-    let prev = floor.clone();
-    for i in 0..height {
-        for j in 0..width {
-            if let Some(Cucumber::South) = prev[if i == 0 { height - 1 } else { i - 1 }][j] {
-                if prev[i][j].is_none() {
-                    floor[i][j] = Some(Cucumber::South);
-                    floor[if i == 0 { height - 1 } else { i - 1 }][j] = None;
+    for cucumber in order {
+        let prev = floor.clone();
+        for y in 0..height {
+            for x in 0..width {
+                let (y_check, x_check) = match cucumber {
+                    Cucumber::East => (y, if x == 0 { width - 1 } else { x - 1 }),
+                    Cucumber::South => (if y == 0 { height - 1 } else { y - 1 }, x),
+                };
+                if prev[y_check][x_check] == Some(cucumber) && prev[y][x].is_none() {
+                    floor[y][x] = Some(cucumber);
+                    floor[y_check][x_check] = None;
                     changed = true;
                 }
             }
