@@ -136,22 +136,21 @@ impl State {
 }
 
 #[cached]
-fn get_energy_cost(state: State, total: usize) -> usize {
+fn get_energy_cost(state: State, total: usize) -> Option<usize> {
     let moves = state.get_moves();
 
     if moves.is_empty() {
         if state.hallway.iter().all(|&c| c == 'E') {
-            return total;
+            return Some(total);
         } else {
-            return usize::MAX;
+            return None;
         }
     }
 
     moves
         .iter()
-        .map(|(state, cost)| get_energy_cost(state.clone(), total + cost))
+        .filter_map(|(state, cost)| get_energy_cost(state.clone(), total + cost))
         .min()
-        .unwrap()
 }
 
 fn main() {
@@ -175,6 +174,6 @@ fn main() {
         ],
     };
 
-    println!("Part 1: {}", get_energy_cost(input1, 0));
-    println!("Part 2: {}", get_energy_cost(input2, 0));
+    println!("Part 1: {}", get_energy_cost(input1, 0).unwrap());
+    println!("Part 2: {}", get_energy_cost(input2, 0).unwrap());
 }
